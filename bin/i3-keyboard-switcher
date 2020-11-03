@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+const path = require('path');
+const fs = require('fs');
+const keyboardSwitcher = require('../index.js');
+
+const args = process.argv.slice(2);
+
+const log = (message) => {
+    fs.appendFileSync(path.join(__dirname, '../test.log'), `${message}\r\n`);
+};
+
+if (args.includes('switch') ) {
+    (async () => {
+        log('switching');
+        try {
+            const result = await keyboardSwitcher.switchLayout();
+            const ok = await result.text();
+            log('ok ' + ok);
+        } catch (err) {
+            log(`err {err.name}`);
+        }
+        process.exit(0);
+    })();
+    return;
+}
+
+keyboardSwitcher.start(args);
+
+
