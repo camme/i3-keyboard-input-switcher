@@ -7,7 +7,9 @@ const path = require('path');
 const fs = require('fs');
 
 const log = (message) => {
-    fs.appendFileSync(path.join(__dirname, './test.log'), `${message}\r\n`);
+    if (process.env.DEBUG_I3) {
+        fs.appendFileSync(path.join(__dirname, './test.log'), `${message}\r\n`);
+    }
 };
 
 const current = {};

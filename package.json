@@ -1,6 +1,6 @@
 {
   "name": "i3-keyboard-input-switcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "I3 Keyboard layout switcher that remembers the layour for each app",
   "main": "index.js",
   "scripts": {
