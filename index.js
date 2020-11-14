@@ -6,7 +6,8 @@ const path = require('path');
 const fs = require('fs');
 
 const appPath = (path.join(process.env.HOME, './.config/i3-keyboard-switcher'));
-const current = {};
+let current = {};
+
 let currentInstance = '';
 let index = 0;
 
@@ -15,6 +16,7 @@ let defaults = {
     inputs: ['us', 'se'],
     predefined: { },
     logFile: '/var/log/i3-keyboard-switcher.log',
+    historyFile: path.join(appPath, '.history'),
     log: 'console',
 };
 
@@ -28,6 +30,17 @@ try {
 } catch (_) {
     config = defaults;
 }
+
+const writeHistory = () => new Promise((resolve, reject) => {
+    if (config.historyFile) {
+        fs.writeFile(config.historyFile, JSON.stringify(current, null, 4), 'utf8', (err) => {
+            if (err) {
+                return eject(err);
+            }
+            resolve();
+        });
+    }
+});
 
 const log = (message) => {
     if (config.log) {
@@ -90,6 +103,13 @@ const start = (layoutList) => {
         layoutList = config.inputs;
     }
 
+    try {
+        current = JSON.parse(fs.readFileSync(config.historyFile, 'utf8'));
+    } catch (err) {
+        console.log(err);
+        log('no history');
+    }
+
     const i3Client = i3.createClient();
 
     const requestListener = (req, res) => {
@@ -111,6 +131,7 @@ const start = (layoutList) => {
                 if (currentInstance) {
                     log(`remember ${currentInstance} ${layout}`);
                     current[currentInstance] = layout;
+                    writeHistory();
                 }
                 return res.end('ok -- ' + layout + ' ' + index);
             }
